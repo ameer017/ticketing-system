@@ -1,0 +1,5 @@
+=====================Support Ticket Management API=====================
+
+Imagine you're building a system for a company where customers can report issues and the support team can track and resolve them.
+
+Your task is to build the backend for this system.
