@@ -21,21 +21,38 @@ const createTicket = asyncHandler(async (req, res) => {
 });
 
 const getTickets = asyncHandler(async (req, res) => {
-  const ticks = await Ticket.find().sort("-createdAt");
+  const page = Math.max(1, Number(req.query.page) || 1);
+  const limit = Math.min(50, Math.max(1, Number(req.query.limit) || 10));
+  const skip = (page - 1) * limit;
 
-  if (!ticks) {
-    res.status(500);
-    throw new Error("Something went wrong");
-  }
-  res.status(200).json(ticks);
+  const [tickets, total] = await Promise.all([
+    Ticket.find({}, { __v: 0 })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("assignedUser", "firstName lastName email userName"),
+    Ticket.countDocuments(),
+  ]);
+
+  res.status(200).json({
+    tickets,
+    page,
+    limit,
+    total,
+  });
 });
 
 const getTicket = asyncHandler(async (req, res) => {
-  const ticket = await Ticket.findById(req.params.id);
+  const ticket = await Ticket.findById(req.params.id).populate(
+    "assignedUser",
+    "firstName lastName email userName",
+  );
+
   if (!ticket) {
     res.status(404);
     throw new Error("Ticket not found");
   }
+
   res.status(200).json(ticket);
 });
 
@@ -51,6 +68,7 @@ const deleteTicket = asyncHandler(async (req, res) => {
 const updateTicket = asyncHandler(async (req, res) => {
   const ticket = await Ticket.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
+    runValidators: true,
   });
   if (!ticket) {
     res.status(404);

@@ -1,12 +1,15 @@
 const express = require("express");
 const router = express.Router();
 const {
-    createTicket,
-    getTickets,
-    getTicket,
-    updateTicket,
-    deleteTicket,
+  createTicket,
+  getTickets,
+  getTicket,
+  updateTicket,
+  deleteTicket,
 } = require("../controller/ticket.controller");
+const protect = require("../middleware/auth.middleware");
+
+router.use(protect);
 
 router.post("/ticket", createTicket);
 router.get("/tickets", getTickets);

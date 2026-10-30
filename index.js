@@ -1,24 +1,26 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const bodyParser = require("body-parser")
 const cookieParser = require("cookie-parser");
+
 const errorCatcher = require("./middleware/error.middleware");
 
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-const app = express()
-const PORT = process.env.PORT || 3000
+app.use(cors({
+  origin: process.env.CLIENT_URL || "*",
+  credentials: true,
+}));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: false, limit: "1mb" }));
 app.use(cookieParser());
-app.use(bodyParser.json());
 
-
-
-app.use(cors());
-app.use(errorCatcher);  
+app.use(errorCatcher);
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
+
+module.exports = app;

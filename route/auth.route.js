@@ -7,11 +7,13 @@ const {
   GetUsers,
   GetUser,
 } = require("../controller/auth.controller");
+const protect = require("../middleware/auth.middleware");
+const rateLimiter = require("../middleware/rateLimiter.middleware");
 
-router.post("/register", CreateUser);
-router.post("/login", LoginUser);
+router.post("/register", rateLimiter, CreateUser);
+router.post("/login", rateLimiter, LoginUser);
 router.post("/logout", LogOutUser);
-router.get("/users", GetUsers);
-router.get("/user/:id", GetUser);
+router.get("/users", protect, GetUsers);
+router.get("/user/:id", protect, GetUser);
 
 module.exports = router;

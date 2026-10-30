@@ -3,29 +3,28 @@ const schema = mongoose.Schema;
 
 const ticketSchema = new schema(
   {
-    _id: {
-      type: String,
-      required: true,
-      unique: true,
-    },
     title: {
       type: String,
       required: true,
+      trim: true,
     },
     description: {
       type: String,
       required: true,
+      trim: true,
     },
     assignedUser: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: User,
+      ref: "User",
+      index: true,
     },
     status: {
       type: String,
       required: true,
       enum: ["open", "closed"],
       default: "open",
+      index: true,
     },
   },
   {
@@ -33,6 +32,9 @@ const ticketSchema = new schema(
     minimize: false,
   },
 );
+
+ticketSchema.index({ createdAt: -1 });
+ticketSchema.index({ assignedUser: 1, status: 1 });
 
 const Ticket = mongoose.model("Ticket", ticketSchema);
 module.exports = Ticket;
